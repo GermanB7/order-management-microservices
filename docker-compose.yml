@@ -1,0 +1,56 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres_db
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: order_management
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    restart: always
+    ports:
+      - "5672:5672"  # Puerto AMQP para la comunicación
+      - "15672:15672" # Interfaz web de RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: user
+      RABBITMQ_DEFAULT_PASS: password
+
+  order-management:
+    build: ./order-management
+    container_name: order-management
+    restart: always
+    ports:
+      - "3003:3000"
+    depends_on:
+      - db
+      - rabbitmq
+    environment:
+      DATABASE_URL: "postgresql://user:password@db:5432/order_management"
+      JWT_SECRET: "secreto_super_seguro"
+      RABBITMQ_URL: "amqp://user:password@rabbitmq:5672"
+    command: sh -c "while ! nc -z rabbitmq 5672; do echo 'Waiting for RabbitMQ...'; sleep 1; done; npm run start"
+
+
+  notification-service:
+    build: ./notification-service
+    container_name: notification-service
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - rabbitmq
+    environment:
+      RABBITMQ_URL: "amqp://user:password@rabbitmq:5672"
+
+volumes:
+  pgdata:

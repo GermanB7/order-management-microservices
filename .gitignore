@@ -1,0 +1,46 @@
+# Node.js dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios de compilación
+dist/
+coverage/
+
+# Configuración del entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos generados por Docker
+docker-compose.override.yml
+docker-compose.override.yml
+docker-compose.prod.yml
+docker-compose.dev.yml
+
+# Bases de datos locales
+*.sqlite
+*.pgsql
+
+# Configuración de Prisma
+prisma/migrations/
+prisma/dev.db
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Otros archivos de configuración innecesarios
+package-lock.json
