@@ -7,7 +7,8 @@ WORKDIR /app
 # Copiar package.json y package-lock.json antes de instalar dependencias
 COPY package*.json ./
 
-RUN apt-get update && apt-get install -y netcat
+RUN apt-get update && apt-get install -y netcat-openbsd
+
 # Instalamos dependencias
 RUN npm install -g @nestjs/cli && npm install --omit=dev
 

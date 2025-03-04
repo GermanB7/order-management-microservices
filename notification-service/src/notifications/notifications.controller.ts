@@ -1,28 +1,30 @@
-import { Controller } from '@nestjs/common';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { Controller, Logger } from '@nestjs/common';
+import { MessagePattern, Payload } from '@nestjs/microservices';
 import { NotificationsService } from './notifications.service';
 
 @Controller()
 export class NotificationsController {
+  private readonly logger = new Logger(NotificationsController.name);
+
   constructor(private readonly notificationsService: NotificationsService) {}
 
-  @EventPattern('order_created')
-  handleOrderCreated(@Payload() data: { orderId: string; userId: string }) {
-    console.log('📦 Pedido creado recibido:', data);
-    return this.notificationsService.sendNotification(
+  @MessagePattern('order_created')
+  async handleOrderCreated(@Payload() data: { orderId: string; userId: string }) {
+    this.logger.log(`📩 Evento recibido 'order_created': ${JSON.stringify(data)}`);
+    await this.notificationsService.sendNotification(
       data.orderId,
       data.userId,
-      'Tu pedido ha sido creado exitosamente.',
+      'Tu orden ha sido creada con éxito!'
     );
   }
 
-  @EventPattern('order_status_updated')
-  handleOrderStatusUpdated(@Payload() data: { orderId: string; status: string }) {
-    console.log('🔄 Pedido actualizado recibido:', data);
-    return this.notificationsService.sendNotification(
+  @MessagePattern('order_status_updated')
+  async handleOrderStatusUpdated(@Payload() data: { orderId: string; status: string; userId: string }) {
+    this.logger.log(`📩 Evento recibido 'order_status_updated': ${JSON.stringify(data)}`);
+    await this.notificationsService.sendNotification(
       data.orderId,
-      '',
-      `El estado de tu pedido ha cambiado a: ${data.status}`,
+      data.userId, // ✅ Ahora sí existe
+      `El estado de tu orden ha cambiado a: ${data.status}`
     );
   }
 }

@@ -1,18 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { OrdersController } from './orders.controller';
+import { OrdersService } from './orders.service';
+import { PrismaService } from '../prisma/prisma.service';
 
-describe('OrdersController', () => {
-  let controller: OrdersController;
+describe('OrdersService', () => {
+  let service: OrdersService;
+  let prisma: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [OrdersController],
+      providers: [OrdersService, PrismaService],
     }).compile();
 
-    controller = module.get<OrdersController>(OrdersController);
+    service = module.get<OrdersService>(OrdersService);
+    prisma = module.get<PrismaService>(PrismaService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('debería estar definido', () => {
+    expect(service).toBeDefined();
+  });
+
+  it('debería crear una orden', async () => {
+    const mockOrder = { id: '1', userId: '123', status: 'pending' };
+    jest.spyOn(prisma.order, 'create').mockResolvedValue(mockOrder);
+    
+    const result = await service.createOrder('123');
+    expect(result).toEqual(mockOrder);
   });
 });
